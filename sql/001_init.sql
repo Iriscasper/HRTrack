@@ -22,6 +22,7 @@ USE `hrtrack`;
 -- Volcando estructura para tabla hrtrack.notifications
 CREATE TABLE IF NOT EXISTS `notifications` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
   `supply_id` int(10) unsigned NOT NULL,
   `schedule_id` int(10) unsigned NOT NULL,
   `type` enum('reminder','low_stock','missed') DEFAULT NULL,
@@ -30,8 +31,10 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   PRIMARY KEY (`id`),
   KEY `FK_notifications_supplies` (`supply_id`),
   KEY `FK_notifications_schedules` (`schedule_id`),
+  KEY `FK_notifications_users` (`user_id`),
   CONSTRAINT `FK_notifications_schedules` FOREIGN KEY (`schedule_id`) REFERENCES `schedules` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_notifications_supplies` FOREIGN KEY (`supply_id`) REFERENCES `supplies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_notifications_supplies` FOREIGN KEY (`supply_id`) REFERENCES `supplies` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_notifications_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- Volcando datos para la tabla hrtrack.notifications: ~0 rows (aproximadamente)
@@ -58,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `supplies` (
   `name` varchar(100) NOT NULL,
   `color` varchar(50) NOT NULL,
   `stock` int(11) DEFAULT NULL,
-  `frequency` int(10) unsigned DEFAULT NULL,
+  `frequency` int(11) unsigned DEFAULT NULL,
   `start_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_supplies_users` (`user_id`),
@@ -69,12 +72,13 @@ CREATE TABLE IF NOT EXISTS `supplies` (
 
 -- Volcando estructura para tabla hrtrack.users
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(100) NOT NULL,
-  `password_hash` varchar(100) NOT NULL,
-  `role` int(11) unsigned NOT NULL,
-  `active` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
+  `password_hash` varchar(255) NOT NULL,
+  `role` int(10) unsigned NOT NULL COMMENT '0 = user, 1 = admin',
+  `active` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- Volcando datos para la tabla hrtrack.users: ~0 rows (aproximadamente)
