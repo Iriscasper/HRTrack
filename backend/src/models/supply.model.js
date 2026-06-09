@@ -19,12 +19,14 @@ async function create(
   userId,
   { name, color, stock, frequency, frequency_type, start_date },
 ) {
-  const date = start_date || new Date()
+  const date = start_date ? new Date(start_date) : new Date()
   const [result] = await db.query(
-    "INSERT INTO supplies (user_id, name, color, stock, frequency, frequency_type, start_date) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    `INSERT INTO supplies
+      (user_id, name, color, stock, frequency, frequency_type, start_date)
+      VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [userId, name, color, stock, frequency, frequency_type, date],
   )
-  return result.insertId
+  return { id: result.insertId, date }
 }
 
 async function update(
@@ -38,7 +40,9 @@ async function update(
   const keys = Object.keys(fields)
   const values = Object.values(fields)
 
-  const query = `UPDATE supplies SET ${keys.map((k) => `${k} = ?`).join(", ")} WHERE id = ? AND user_id = ?`
+  const query = `UPDATE supplies
+      SET ${keys.map((k) => `${k} = ?`).join(", ")}
+      WHERE id = ? AND user_id = ?`
 
   const [result] = await db.query(query, [...values, id, userId])
   return result.affectedRows

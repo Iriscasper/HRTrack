@@ -12,7 +12,8 @@ async function create(email, passwordHash) {
     throw new Error("EMAIL_IN_USE")
   }
   const [result] = await db.query(
-    "INSERT INTO users (email, password_hash, role, active) VALUES (?, ?, 0, 1)",
+    `INSERT INTO users (email, password_hash, role, active)
+      VALUES (?, ?, 0, 1)`,
     [email, passwordHash],
   )
   return result.insertId

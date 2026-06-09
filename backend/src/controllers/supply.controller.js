@@ -1,4 +1,5 @@
 const supplyModel = require("../models/supply.model")
+const scheduleService = require("../services/schedule.service")
 
 async function getAll(req, res) {
   try {
@@ -31,7 +32,9 @@ async function create(req, res) {
   }
 
   try {
-    const id = await supplyModel.create(req.user.id, {
+    /* Nos traemos la fecha, en caso de que el usuario no la de, así sólo
+    se genera una vez en el modelo y no duplicamos la lógica aquí */
+    const { id, date } = await supplyModel.create(req.user.id, {
       name,
       color,
       stock,
@@ -39,6 +42,9 @@ async function create(req, res) {
       frequency_type,
       start_date,
     })
+
+    await scheduleService.generateSlots(id, date, frequency, frequency_type)
+
     res.status(201).json({ message: "Suministro creado", id })
   } catch (err) {
     console.error("Error en create supply:", err)
@@ -47,12 +53,20 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
-  const { name, color, stock, frequency, start_date } = req.body
+  const {
+    name,
+    color,
+    stock,
+    frequency,
+    frequency_type,
+    start_date,
+    regenerate_schedules,
+  } = req.body
 
-  if (!name || !color || !frequency) {
-    return res
-      .status(400)
-      .json({ error: "Nombre, color y frecuencia son obligatorios" })
+  if (!name || !color || !frequency || !frequency_type) {
+    return res.status(400).json({
+      error: "Nombre, color, frecuencia y tipo de frecuencia son obligatorios",
+    })
   }
 
   try {
@@ -61,11 +75,25 @@ async function update(req, res) {
       color,
       stock,
       frequency,
+      frequency_type,
       start_date,
     })
+
     if (!affected) {
       return res.status(404).json({ error: "Suministro no encontrado" })
     }
+
+    if (regenerate_schedules) {
+      await scheduleService.deletePending(req.params.id)
+      const date = start_date ? new Date(start_date) : new Date()
+      await scheduleService.generateSlots(
+        req.params.id,
+        date,
+        frequency,
+        frequency_type,
+      )
+    }
+
     res.json({ message: "Suministro actualizado" })
   } catch (err) {
     res.status(500).json({ error: "Error interno del servidor" })

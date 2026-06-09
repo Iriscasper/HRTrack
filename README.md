@@ -10,3 +10,6 @@
 
 ## Producción en Vercel
 La URL es https://hrtrack-one.vercel.app/
+
+## Producción en Railway
+La URL es https://hrtrack-production-8fa1.up.railway.app
