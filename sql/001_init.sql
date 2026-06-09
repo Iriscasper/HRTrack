@@ -61,14 +61,17 @@ CREATE TABLE IF NOT EXISTS `supplies` (
   `name` varchar(100) NOT NULL,
   `color` varchar(50) NOT NULL,
   `stock` int(11) DEFAULT NULL,
-  `frequency` int(11) unsigned DEFAULT NULL,
+  `frequency` varchar(20) NOT NULL,
+  `frequency_type` enum('interval','weekdays') NOT NULL DEFAULT 'interval',
   `start_date` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_supplies_users` (`user_id`),
   CONSTRAINT `FK_supplies_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
--- Volcando datos para la tabla hrtrack.supplies: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla hrtrack.supplies: ~1 rows (aproximadamente)
+REPLACE INTO `supplies` (`id`, `user_id`, `name`, `color`, `stock`, `frequency`, `frequency_type`, `start_date`) VALUES
+	(6, 1, 'Testing', '#ff0000', NULL, '2', 'interval', '2026-06-09 20:01:45');
 
 -- Volcando estructura para tabla hrtrack.users
 CREATE TABLE IF NOT EXISTS `users` (
@@ -79,9 +82,11 @@ CREATE TABLE IF NOT EXISTS `users` (
   `active` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
--- Volcando datos para la tabla hrtrack.users: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla hrtrack.users: ~1 rows (aproximadamente)
+REPLACE INTO `users` (`id`, `email`, `password_hash`, `role`, `active`) VALUES
+	(1, 'test@test.com', '$2b$10$n/TTK9yK9/Ru/c4R2/5dYePLnc0utI7JTOQBeoIPTBdxohm1wKPFa', 0, 1);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
